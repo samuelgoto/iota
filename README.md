@@ -1,55 +1,28 @@
 # One-Point Basis Search
 
-This repo currently has several related searches:
+This repo explores three related questions about tiny complete combinatory
+systems:
 
-```text
-Iota-style
-```
+1. Can we find something smaller or simpler than the classic Iota combinator?
+2. Can we find something smaller or simpler than `SK`?
+3. Can we find something smaller or simpler than the classical `J` encoding?
 
-Search for unary rules like `U x -> body`, where the body may mention `S` and
-`K`.
+The answer, within the bounded searches in this repository, is:
 
-```text
-J-style
-```
-
-Search for one-symbol head-pattern systems where certain `J`-only heads behave
-like `S` and `K`, without using `S` or `K` as primitive symbols.
-
-```text
-Ordinary combinator basis
-```
-
-Search for fixed-arity primitive rules like `A a b -> a` and
-`B a b c -> a c (b c)`, then check whether the primitives can produce
-`S` and `K`.
-
-## Summary
-
-We looked for small, complete combinatory systems in three different search
-spaces:
-
-1. `Iota-style`: one unary rule that is allowed to mention `S` and `K` in its body.
-2. `J-style`: one symbol with multiple head-pattern rules, where `J`-only heads
-   behave like `S` and `K`.
-3. Ordinary combinator bases: fixed-arity primitives whose bodies use only
-   their own arguments.
-
-We ranked candidates by simple size metrics for each search space and bounded
-the proof search for `S` and `K` witnesses.
-
-What we found, within those bounds:
-
-1. `Iota-style`: the classic `U x -> x S K` is the smallest standalone result
-   we found, and `U x -> x K S` is a comparable alternative.
-2. `J-style`: the classical `J J` / `J (J J)` system was the smallest
-   non-overlapping result we found.
-3. Ordinary combinator bases: `SK` was the smallest complete basis we found;
-   adding more primitives only produced `SK` plus identity-like extras or larger
-   variants in the bounded searches we ran.
+1. For Iota-like one-symbol systems, we found the classic `U x -> x S K` and a
+   comparable alternative `U x -> x K S`, plus a few longer variants. We did
+   not find a better standalone Iota in the searched space.
+2. For ordinary combinator bases, `SK` was the smallest complete basis we found.
+   Adding more primitives only produced `SK` plus identity-like extras or
+   larger variants.
+3. For `J`-style head-pattern systems, the classical `J J` / `J (J J)` system
+   was the smallest non-overlapping result we found.
 
 These are search results under the metrics in this repository, not proofs of
 global optimality.
+
+The detailed sections below explain each search space and show the exact
+commands and results.
 
 ## J-Style Search
 
