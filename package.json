@@ -1,0 +1,13 @@
+{
+  "name": "iota-one-point-search",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "search": "node ./bin/search.js",
+    "test": "mocha \"test/**/*.test.js\""
+  },
+  "devDependencies": {
+    "mocha": "^10.8.2"
+  }
+}
