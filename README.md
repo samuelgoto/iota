@@ -295,6 +295,7 @@ npm run basis-search -- --primitives 2 --max-arity 3 --max-body-leaves 4 --max-w
 npm run basis-search -- --primitives 2 --max-arity 3 --max-body-leaves 4 --max-witness-size 3 --max-reduction-steps 20 --max-term-size 200 --max-full-size 10
 npm run basis-search -- --primitives 2 --max-arity 3 --max-body-leaves 4 --max-witness-size 4 --max-reduction-steps 30 --max-term-size 300 --max-full-size 11
 npm run basis-search -- --primitives 1 --max-arity 4 --max-body-leaves 5 --max-witness-size 6 --max-reduction-steps 30 --max-term-size 300 --max-full-size 12
+npm run basis-search -- --primitives 3 --max-arity 3 --max-body-leaves 4 --max-witness-size 3 --max-reduction-steps 20 --max-term-size 200 --max-full-size 12
 ```
 
 The main size metric is:
@@ -318,17 +319,60 @@ Current bounded results:
 2 primitives, full size <= 9 -> 0 complete bases
 2 primitives, full size <= 10 -> 2 complete bases
 2 primitives, full size <= 11 -> 6 complete bases
+3 primitives, full size <= 11 -> 0 complete bases
+3 primitives, full size <= 12 -> 6 complete bases
 ```
+
+### Single-Primitive Results
+
+For this search, "single primitive" means one fixed-arity rewrite rule:
+
+```text
+A a b c ... -> Body
+```
+
+where `Body` is made only from the arguments `a`, `b`, `c`, ... . This is a
+stricter notion than Iota or J-style one-symbol systems:
+
+```text
+Iota-style
+```
+
+uses one unary primitive whose definition is allowed to mention `S` and `K`.
+
+```text
+J-style
+```
+
+uses one symbol, but multiple head-pattern rules.
+
+The completed ordinary single-primitive run was:
+
+```sh
+npm run basis-search -- --primitives 1 --max-arity 4 --max-body-leaves 5 --max-witness-size 6 --max-reduction-steps 30 --max-term-size 300 --max-full-size 12
+```
+
+It searched 13,836 candidate one-rule bases and found:
+
+```text
+complete bases found: 0
+```
+
+So, within these bounds, no single ordinary fixed-arity combinator was found
+that derives both `S` and `K`. This is not a proof that no such one-rule
+combinator exists at larger sizes; it only rules out the bounded space above.
+A broader run with arity/body limits raised was much slower and needs more
+pruning before it is useful as a routine check.
 
 At full size 10, the only complete bases found are exactly SK and the swapped
 ordering:
 
 ```text
-A a b c -> a
+A a b -> a
 B a b c -> a c (b c)
 
 S witness: B
-K witness: B A A
+K witness: A
 ```
 
 ```text
@@ -358,6 +402,20 @@ B a b c -> a c (b c)
 S witness: B
 K witness: A
 ```
+
+With three primitives, the first complete bases appear at full size 12. They
+are not smaller than SK; they are SK plus one identity-like primitive:
+
+```text
+A a -> a
+B a b -> a
+C a b c -> a c (b c)
+
+S witness: C
+K witness: B
+```
+
+The other five results at this size are just permutations of those three rules.
 
 The structural filter is on by default. It requires a candidate basis to have at
 least one rule that can discard an argument and at least one rule that can
