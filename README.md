@@ -32,6 +32,44 @@ This is a bounded proof search, not a complete decision procedure for all
 possible candidates. Increasing the expression-size, reduction-step, and
 intermediate-term-size limits can find more witnesses, but may also get slower.
 
+## Names And References
+
+The names in this repo are conservative:
+
+```text
+U x -> ((x S) K)
+```
+
+This is the usual universal Iota combinator. See
+[Iota and Jot](https://en.wikipedia.org/wiki/Iota_and_Jot) and
+[Esolang: Iota](https://esolangs.org/wiki/Iota).
+
+```text
+U x -> ((x K) S)
+```
+
+This is a documented simple alternative one-point basis; see Johannes Bader's
+[One-point bases for lambda-calculus](https://olydis.medium.com/one-point-bases-for-%CE%BB-calculus-4163b1b326ad).
+In the "Similar alternatives" section, Bader lists this exact left-associated
+shape as `X = lambda x -> x "K" "S"` and gives the witnesses `S = X X X` and
+`K = X (S X X)`.
+This repo calls it "Rho-style" only as a local nickname. I have not found a
+standard source that names this basis `rho`.
+
+```text
+U x -> (((x K) S) K)
+```
+
+This is the known `X' = lambda x. x K S K` one-point basis. See the
+[one-point basis section of Combinatory logic](https://en.wikipedia.org/wiki/Combinatory_logic#One-point_basis).
+John Tromp's
+[Bases.lhs](https://github.com/tromp/AIT/blob/master/Bases.lhs)
+also lists this shape as `<K,S,K>`.
+
+The other length-4 candidates below are valid under this repo's bounded search,
+but I have not found standard names or canonical references for them. They are
+best treated as generated SK-packaging variants unless a better source is found.
+
 ## Commands
 
 ```sh
@@ -101,7 +139,9 @@ K witness reduction:
 
 #### 2. `U x -> ((x K) S)`
 
-This is Rho-style:
+This is Rho-style in this repo's local terminology. It is a known simple
+alternative one-point basis, but I have not found `rho` as a standard name for
+it. The reference above lists the same rule as `X = lambda x -> x "K" "S"`.
 
 ```text
 S = U U U
@@ -570,7 +610,8 @@ K witness reduction:
 
 #### 9. `U x -> (((x K) S) K)`
 
-This is Chi-style:
+This is the known `X' = lambda x. x K S K` basis. This repo also calls it
+Chi-style as a local nickname.
 
 ```text
 S = U (U U)
