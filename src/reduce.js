@@ -79,3 +79,27 @@ export function normalize(term, ruleBody, options = {}) {
 
   return { term: current, steps: maxSteps, halted: false, reason: "maxSteps" };
 }
+
+export function traceNormalize(term, ruleBody, options = {}) {
+  const maxSteps = options.maxSteps ?? 1000;
+  const maxTermSize = options.maxTermSize ?? 5000;
+  const terms = [clone(term)];
+  let current = clone(term);
+
+  for (let steps = 0; steps < maxSteps; steps += 1) {
+    if (size(current) > maxTermSize) {
+      return { terms, steps, halted: false, reason: "maxTermSize" };
+    }
+
+    const next = reduceOneNormalOrder(current, ruleBody);
+
+    if (!next) {
+      return { terms, steps, halted: true };
+    }
+
+    current = next;
+    terms.push(current);
+  }
+
+  return { terms, steps: maxSteps, halted: false, reason: "maxSteps" };
+}

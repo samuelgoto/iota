@@ -54,18 +54,590 @@ Length 2:
 none
 ```
 
-Length 3:
+### Length 3
+
+Found 2 candidates.
+
+#### 1. `U x -> ((x S) K)`
+
+This is Iota-style:
 
 ```text
-U x -> ((x S) K)
-U x -> ((x K) S)
+S = U (U (U (U U)))
+K = U (U (U U))
 ```
 
-These correspond to Iota and Rho-style definitions.
-
-Length 4 finds 10 candidates with the default bounded search settings used in
-the tests/manual run. One of them is Chi:
+S witness reduction:
 
 ```text
-U x -> (((x K) S) K)
+   U (U (U (U U)))
+-> U (U (U U)) S K
+-> U (U U) S K S K
+-> U U S K S K S K
+-> U S K S K S K S K
+-> S S K K S K S K S K
+-> S K (K K) S K S K S K
+-> K S ((K K) S) K S K S K
+-> S K S K S K
+-> K K (S K) S K
+-> K S K
+-> S
+```
+
+K witness reduction:
+
+```text
+   U (U (U U))
+-> U (U U) S K
+-> U U S K S K
+-> U S K S K S K
+-> S S K K S K S K
+-> S K (K K) S K S K
+-> K S ((K K) S) K S K
+-> S K S K
+-> K K (S K)
+-> K
+```
+
+#### 2. `U x -> ((x K) S)`
+
+This is Rho-style:
+
+```text
+S = U U U
+K = U ((((U U) U) U) U)
+```
+
+S witness reduction:
+
+```text
+   U U U
+-> U K S U
+-> K K S S U
+-> K S U
+-> S
+```
+
+K witness reduction:
+
+```text
+   U ((((U U) U) U) U)
+-> U U U U U K S
+-> U K S U U U K S
+-> K K S S U U U K S
+-> K S U U U K S
+-> S U U K S
+-> U K (U K) S
+-> K K S (U K) S
+-> K (U K) S
+-> U K
+-> K K S
+-> K
+```
+
+### Length 4
+
+Found 10 candidates.
+
+#### 1. `U x -> (K ((x S) K))`
+
+```text
+S = U ((U (U (U U))) U) U
+K = U (U (U U)) U
+```
+
+S witness reduction:
+
+```text
+   U ((U (U (U U))) U) U
+-> K ((((U (U (U U))) U) S) K) U
+-> U (U (U U)) U S K
+-> K (((U (U U)) S) K) U S K
+-> U (U U) S K S K
+-> K (((U U) S) K) S K S K
+-> U U S K K S K
+-> K ((U S) K) S K K S K
+-> U S K K K S K
+-> K ((S S) K) K K K S K
+-> S S K K K S K
+-> S K (K K) K S K
+-> K K ((K K) K) S K
+-> K S K
+-> S
+```
+
+K witness reduction:
+
+```text
+   U (U (U U)) U
+-> K (((U (U U)) S) K) U
+-> U (U U) S K
+-> K (((U U) S) K) S K
+-> U U S K K
+-> K ((U S) K) S K K
+-> U S K K K
+-> K ((S S) K) K K K
+-> S S K K K
+-> S K (K K) K
+-> K K ((K K) K)
+-> K
+```
+
+#### 2. `U x -> (K ((x K) S))`
+
+```text
+S = U (U (U U)) U
+K = U U U
+```
+
+S witness reduction:
+
+```text
+   U (U (U U)) U
+-> K (((U (U U)) K) S) U
+-> U (U U) K S
+-> K (((U U) K) S) K S
+-> U U K S S
+-> K ((U K) S) K S S
+-> U K S S S
+-> K ((K K) S) S S S
+-> K K S S S
+-> K S S
+-> S
+```
+
+K witness reduction:
+
+```text
+   U U U
+-> K ((U K) S) U
+-> U K S
+-> K ((K K) S) S
+-> K K S
+-> K
+```
+
+#### 3. `U x -> ((x S) (K K))`
+
+```text
+S = U (U U) U
+K = U (U (((U U) U) U))
+```
+
+S witness reduction:
+
+```text
+   U (U U) U
+-> U U S (K K) U
+-> U S (K K) S (K K) U
+-> S S (K K) (K K) S (K K) U
+-> S (K K) ((K K) (K K)) S (K K) U
+-> K K S (((K K) (K K)) S) (K K) U
+-> K (((K K) (K K)) S) (K K) U
+-> K K (K K) S U
+-> K S U
+-> S
+```
+
+K witness reduction:
+
+```text
+   U (U (((U U) U) U))
+-> U (((U U) U) U) S (K K)
+-> U U U U S (K K) S (K K)
+-> U S (K K) U U S (K K) S (K K)
+-> S S (K K) (K K) U U S (K K) S (K K)
+-> S (K K) ((K K) (K K)) U U S (K K) S (K K)
+-> K K U (((K K) (K K)) U) U S (K K) S (K K)
+-> K (((K K) (K K)) U) U S (K K) S (K K)
+-> K K (K K) U S (K K) S (K K)
+-> K U S (K K) S (K K)
+-> U (K K) S (K K)
+-> K K S (K K) S (K K)
+-> K (K K) S (K K)
+-> K K (K K)
+-> K
+```
+
+#### 4. `U x -> ((x K) (x S))`
+
+```text
+S = U (U (U U)) U
+K = U ((((U (U (U U))) U) U) U)
+```
+
+S witness reduction:
+
+```text
+   U (U (U U)) U
+-> U (U U) K ((U (U U)) S) U
+-> U U K ((U U) S) K ((U (U U)) S) U
+-> U K (U S) K ((U U) S) K ((U (U U)) S) U
+-> K K (K S) (U S) K ((U U) S) K ((U (U U)) S) U
+-> K (U S) K ((U U) S) K ((U (U U)) S) U
+-> U S ((U U) S) K ((U (U U)) S) U
+-> S K (S S) ((U U) S) K ((U (U U)) S) U
+-> K ((U U) S) ((S S) ((U U) S)) K ((U (U U)) S) U
+-> U U S K ((U (U U)) S) U
+-> U K (U S) S K ((U (U U)) S) U
+-> K K (K S) (U S) S K ((U (U U)) S) U
+-> K (U S) S K ((U (U U)) S) U
+-> U S K ((U (U U)) S) U
+-> S K (S S) K ((U (U U)) S) U
+-> K K ((S S) K) ((U (U U)) S) U
+-> K ((U (U U)) S) U
+-> U (U U) S
+-> U U K ((U U) S) S
+-> U K (U S) K ((U U) S) S
+-> K K (K S) (U S) K ((U U) S) S
+-> K (U S) K ((U U) S) S
+-> U S ((U U) S) S
+-> S K (S S) ((U U) S) S
+-> K ((U U) S) ((S S) ((U U) S)) S
+-> U U S S
+-> U K (U S) S S
+-> K K (K S) (U S) S S
+-> K (U S) S S
+-> U S S
+-> S K (S S) S
+-> K S ((S S) S)
+-> S
+```
+
+K witness reduction:
+
+```text
+   U ((((U (U (U U))) U) U) U)
+-> U (U (U U)) U U U K (((((U (U (U U))) U) U) U) S)
+-> U (U U) K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> U U K ((U U) S) K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> U K (U S) K ((U U) S) K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> K K (K S) (U S) K ((U U) S) K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> K (U S) K ((U U) S) K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> U S ((U U) S) K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> S K (S S) ((U U) S) K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> K ((U U) S) ((S S) ((U U) S)) K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> U U S K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> U K (U S) S K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> K K (K S) (U S) S K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> K (U S) S K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> U S K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> S K (S S) K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> K K ((S S) K) ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> K ((U (U U)) S) U U U K (((((U (U (U U))) U) U) U) S)
+-> U (U U) S U U K (((((U (U (U U))) U) U) U) S)
+-> U U K ((U U) S) S U U K (((((U (U (U U))) U) U) U) S)
+-> U K (U S) K ((U U) S) S U U K (((((U (U (U U))) U) U) U) S)
+-> K K (K S) (U S) K ((U U) S) S U U K (((((U (U (U U))) U) U) U) S)
+-> K (U S) K ((U U) S) S U U K (((((U (U (U U))) U) U) U) S)
+-> U S ((U U) S) S U U K (((((U (U (U U))) U) U) U) S)
+-> S K (S S) ((U U) S) S U U K (((((U (U (U U))) U) U) U) S)
+-> K ((U U) S) ((S S) ((U U) S)) S U U K (((((U (U (U U))) U) U) U) S)
+-> U U S S U U K (((((U (U (U U))) U) U) U) S)
+-> U K (U S) S S U U K (((((U (U (U U))) U) U) U) S)
+-> K K (K S) (U S) S S U U K (((((U (U (U U))) U) U) U) S)
+-> K (U S) S S U U K (((((U (U (U U))) U) U) U) S)
+-> U S S U U K (((((U (U (U U))) U) U) U) S)
+-> S K (S S) S U U K (((((U (U (U U))) U) U) U) S)
+-> K S ((S S) S) U U K (((((U (U (U U))) U) U) U) S)
+-> S U U K (((((U (U (U U))) U) U) U) S)
+-> U K (U K) (((((U (U (U U))) U) U) U) S)
+-> K K (K S) (U K) (((((U (U (U U))) U) U) U) S)
+-> K (U K) (((((U (U (U U))) U) U) U) S)
+-> U K
+-> K K (K S)
+-> K
+```
+
+#### 5. `U x -> ((x K) (K S))`
+
+```text
+S = U (U U)
+K = U (((U (U U)) U) U)
+```
+
+S witness reduction:
+
+```text
+   U (U U)
+-> U U K (K S)
+-> U K (K S) K (K S)
+-> K K (K S) (K S) K (K S)
+-> K (K S) K (K S)
+-> K S (K S)
+-> S
+```
+
+K witness reduction:
+
+```text
+   U (((U (U U)) U) U)
+-> U (U U) U U K (K S)
+-> U U K (K S) U U K (K S)
+-> U K (K S) K (K S) U U K (K S)
+-> K K (K S) (K S) K (K S) U U K (K S)
+-> K (K S) K (K S) U U K (K S)
+-> K S (K S) U U K (K S)
+-> S U U K (K S)
+-> U K (U K) (K S)
+-> K K (K S) (U K) (K S)
+-> K (U K) (K S)
+-> U K
+-> K K (K S)
+-> K
+```
+
+#### 6. `U x -> ((x (K S)) K)`
+
+```text
+S = U (U U)
+K = U (((U (U U)) U) U)
+```
+
+S witness reduction:
+
+```text
+   U (U U)
+-> U U (K S) K
+-> U (K S) K (K S) K
+-> K S (K S) K K (K S) K
+-> S K K (K S) K
+-> K (K S) (K (K S)) K
+-> K S K
+-> S
+```
+
+K witness reduction:
+
+```text
+   U (((U (U U)) U) U)
+-> U (U U) U U (K S) K
+-> U U (K S) K U U (K S) K
+-> U (K S) K (K S) K U U (K S) K
+-> K S (K S) K K (K S) K U U (K S) K
+-> S K K (K S) K U U (K S) K
+-> K (K S) (K (K S)) K U U (K S) K
+-> K S K U U (K S) K
+-> S U U (K S) K
+-> U (K S) (U (K S)) K
+-> K S (K S) K (U (K S)) K
+-> S K (U (K S)) K
+-> K K ((U (K S)) K)
+-> K
+```
+
+#### 7. `U x -> ((x (K K)) S)`
+
+```text
+S = U U
+K = U (U (U ((U U) U)))
+```
+
+S witness reduction:
+
+```text
+   U U
+-> U (K K) S
+-> K K (K K) S S
+-> K S S
+-> S
+```
+
+K witness reduction:
+
+```text
+   U (U (U ((U U) U)))
+-> U (U ((U U) U)) (K K) S
+-> U ((U U) U) (K K) S (K K) S
+-> U U U (K K) S (K K) S (K K) S
+-> U (K K) S U (K K) S (K K) S (K K) S
+-> K K (K K) S S U (K K) S (K K) S (K K) S
+-> K S S U (K K) S (K K) S (K K) S
+-> S U (K K) S (K K) S (K K) S
+-> U S ((K K) S) (K K) S (K K) S
+-> S (K K) S ((K K) S) (K K) S (K K) S
+-> K K ((K K) S) (S ((K K) S)) (K K) S (K K) S
+-> K (S ((K K) S)) (K K) S (K K) S
+-> S ((K K) S) S (K K) S
+-> K K S (K K) (S (K K)) S
+-> K (K K) (S (K K)) S
+-> K K S
+-> K
+```
+
+#### 8. `U x -> (((x K) S) S)`
+
+```text
+S = U (U (U (((U U) U) (U U))))
+K = U (U ((U (U U)) (U U)))
+```
+
+S witness reduction:
+
+```text
+   U (U (U (((U U) U) (U U))))
+-> U (U (((U U) U) (U U))) K S S
+-> U (((U U) U) (U U)) K S S K S S
+-> U U U (U U) K S S K S S K S S
+-> U K S S U (U U) K S S K S S K S S
+-> K K S S S S U (U U) K S S K S S K S S
+-> K S S S U (U U) K S S K S S K S S
+-> S S U (U U) K S S K S S K S S
+-> S (U U) (U (U U)) K S S K S S K S S
+-> U U K ((U (U U)) K) S S K S S K S S
+-> U K S S K ((U (U U)) K) S S K S S K S S
+-> K K S S S S K ((U (U U)) K) S S K S S K S S
+-> K S S S K ((U (U U)) K) S S K S S K S S
+-> S S K ((U (U U)) K) S S K S S K S S
+-> S ((U (U U)) K) (K ((U (U U)) K)) S S K S S K S S
+-> U (U U) K S ((K ((U (U U)) K)) S) S K S S K S S
+-> U U K S S K S ((K ((U (U U)) K)) S) S K S S K S S
+-> U K S S K S S K S ((K ((U (U U)) K)) S) S K S S K S S
+-> K K S S S S K S S K S ((K ((U (U U)) K)) S) S K S S K S S
+-> K S S S K S S K S ((K ((U (U U)) K)) S) S K S S K S S
+-> S S K S S K S ((K ((U (U U)) K)) S) S K S S K S S
+-> S S (K S) S K S ((K ((U (U U)) K)) S) S K S S K S S
+-> S S ((K S) S) K S ((K ((U (U U)) K)) S) S K S S K S S
+-> S K (((K S) S) K) S ((K ((U (U U)) K)) S) S K S S K S S
+-> K S ((((K S) S) K) S) ((K ((U (U U)) K)) S) S K S S K S S
+-> S ((K ((U (U U)) K)) S) S K S S K S S
+-> K ((U (U U)) K) S K (S K) S S K S S
+-> U (U U) K K (S K) S S K S S
+-> U U K S S K K (S K) S S K S S
+-> U K S S K S S K K (S K) S S K S S
+-> K K S S S S K S S K K (S K) S S K S S
+-> K S S S K S S K K (S K) S S K S S
+-> S S K S S K K (S K) S S K S S
+-> S S (K S) S K K (S K) S S K S S
+-> S S ((K S) S) K K (S K) S S K S S
+-> S K (((K S) S) K) K (S K) S S K S S
+-> K K ((((K S) S) K) K) (S K) S S K S S
+-> K (S K) S S K S S
+-> S K S K S S
+-> K K (S K) S S
+-> K S S
+-> S
+```
+
+K witness reduction:
+
+```text
+   U (U ((U (U U)) (U U)))
+-> U ((U (U U)) (U U)) K S S
+-> U (U U) (U U) K S S K S S
+-> U U K S S (U U) K S S K S S
+-> U K S S K S S (U U) K S S K S S
+-> K K S S S S K S S (U U) K S S K S S
+-> K S S S K S S (U U) K S S K S S
+-> S S K S S (U U) K S S K S S
+-> S S (K S) S (U U) K S S K S S
+-> S S ((K S) S) (U U) K S S K S S
+-> S (U U) (((K S) S) (U U)) K S S K S S
+-> U U K ((((K S) S) (U U)) K) S S K S S
+-> U K S S K ((((K S) S) (U U)) K) S S K S S
+-> K K S S S S K ((((K S) S) (U U)) K) S S K S S
+-> K S S S K ((((K S) S) (U U)) K) S S K S S
+-> S S K ((((K S) S) (U U)) K) S S K S S
+-> S ((((K S) S) (U U)) K) (K ((((K S) S) (U U)) K)) S S K S S
+-> K S S (U U) K S ((K ((((K S) S) (U U)) K)) S) S K S S
+-> S (U U) K S ((K ((((K S) S) (U U)) K)) S) S K S S
+-> U U S (K S) ((K ((((K S) S) (U U)) K)) S) S K S S
+-> U K S S S (K S) ((K ((((K S) S) (U U)) K)) S) S K S S
+-> K K S S S S S (K S) ((K ((((K S) S) (U U)) K)) S) S K S S
+-> K S S S S (K S) ((K ((((K S) S) (U U)) K)) S) S K S S
+-> S S S (K S) ((K ((((K S) S) (U U)) K)) S) S K S S
+-> S (K S) (S (K S)) ((K ((((K S) S) (U U)) K)) S) S K S S
+-> K S ((K ((((K S) S) (U U)) K)) S) ((S (K S)) ((K ((((K S) S) (U U)) K)) S)) S K S S
+-> S ((S (K S)) ((K ((((K S) S) (U U)) K)) S)) S K S S
+-> S (K S) ((K ((((K S) S) (U U)) K)) S) K (S K) S S
+-> K S K (((K ((((K S) S) (U U)) K)) S) K) (S K) S S
+-> S (((K ((((K S) S) (U U)) K)) S) K) (S K) S S
+-> K ((((K S) S) (U U)) K) S K S ((S K) S) S
+-> K S S (U U) K K S ((S K) S) S
+-> S (U U) K K S ((S K) S) S
+-> U U K (K K) S ((S K) S) S
+-> U K S S K (K K) S ((S K) S) S
+-> K K S S S S K (K K) S ((S K) S) S
+-> K S S S K (K K) S ((S K) S) S
+-> S S K (K K) S ((S K) S) S
+-> S (K K) (K (K K)) S ((S K) S) S
+-> K K S ((K (K K)) S) ((S K) S) S
+-> K ((K (K K)) S) ((S K) S) S
+-> K (K K) S S
+-> K K S
+-> K
+```
+
+#### 9. `U x -> (((x K) S) K)`
+
+This is Chi-style:
+
+```text
+S = U (U U)
+K = U U U
+```
+
+S witness reduction:
+
+```text
+   U (U U)
+-> U U K S K
+-> U K S K K S K
+-> K K S K S K K S K
+-> K K S K K S K
+-> K K K S K
+-> K S K
+-> S
+```
+
+K witness reduction:
+
+```text
+   U U U
+-> U K S K U
+-> K K S K S K U
+-> K K S K U
+-> K K U
+-> K
+```
+
+#### 10. `U x -> (((x K) K) S)`
+
+```text
+S = U (U U)
+K = U (U (U ((U U) U)))
+```
+
+S witness reduction:
+
+```text
+   U (U U)
+-> U U K K S
+-> U K K S K K S
+-> K K K S K S K K S
+-> K S K S K K S
+-> S S K K S
+-> S K (K K) S
+-> K S ((K K) S)
+-> S
+```
+
+K witness reduction:
+
+```text
+   U (U (U ((U U) U)))
+-> U (U ((U U) U)) K K S
+-> U ((U U) U) K K S K K S
+-> U U U K K S K K S K K S
+-> U K K S U K K S K K S K K S
+-> K K K S K S U K K S K K S K K S
+-> K S K S U K K S K K S K K S
+-> S S U K K S K K S K K S
+-> S K (U K) K S K K S K K S
+-> K K ((U K) K) S K K S K K S
+-> K S K K S K K S
+-> S K S K K S
+-> K K (S K) K S
+-> K K S
+-> K
 ```
