@@ -24,6 +24,33 @@ Search for fixed-arity primitive rules like `A a b -> a` and
 `B a b c -> a c (b c)`, then check whether the primitives can produce
 `S` and `K`.
 
+## Summary
+
+We looked for small, complete combinatory systems in three different search
+spaces:
+
+1. `Iota-style`: one unary rule that is allowed to mention `S` and `K` in its body.
+2. `J-style`: one symbol with multiple head-pattern rules, where `J`-only heads
+   behave like `S` and `K`.
+3. Ordinary combinator bases: fixed-arity primitives whose bodies use only
+   their own arguments.
+
+We ranked candidates by simple size metrics for each search space and bounded
+the proof search for `S` and `K` witnesses.
+
+What we found, within those bounds:
+
+1. `Iota-style`: the classic `U x -> x S K` is the smallest standalone result
+   we found, and `U x -> x K S` is a comparable alternative.
+2. `J-style`: the classical `J J` / `J (J J)` system was the smallest
+   non-overlapping result we found.
+3. Ordinary combinator bases: `SK` was the smallest complete basis we found;
+   adding more primitives only produced `SK` plus identity-like extras or larger
+   variants in the bounded searches we ran.
+
+These are search results under the metrics in this repository, not proofs of
+global optimality.
+
 ## J-Style Search
 
 The J-style search is deliberately separate from the Iota-style search. It does
@@ -296,6 +323,7 @@ npm run basis-search -- --primitives 2 --max-arity 3 --max-body-leaves 4 --max-w
 npm run basis-search -- --primitives 2 --max-arity 3 --max-body-leaves 4 --max-witness-size 4 --max-reduction-steps 30 --max-term-size 300 --max-full-size 11
 npm run basis-search -- --primitives 1 --max-arity 4 --max-body-leaves 5 --max-witness-size 6 --max-reduction-steps 30 --max-term-size 300 --max-full-size 12
 npm run basis-search -- --primitives 3 --max-arity 3 --max-body-leaves 4 --max-witness-size 3 --max-reduction-steps 20 --max-term-size 200 --max-full-size 12
+npm run basis-search -- --primitives 4 --max-arity 3 --max-body-leaves 4 --max-witness-size 3 --max-reduction-steps 20 --max-term-size 200 --max-full-size 14
 ```
 
 The main size metric is:
@@ -321,6 +349,8 @@ Current bounded results:
 2 primitives, full size <= 11 -> 6 complete bases
 3 primitives, full size <= 11 -> 0 complete bases
 3 primitives, full size <= 12 -> 6 complete bases
+4 primitives, full size <= 13 -> 0 complete bases
+4 primitives, full size <= 14 -> 12 complete bases
 ```
 
 ### Single-Primitive Results
@@ -416,6 +446,21 @@ K witness: B
 ```
 
 The other five results at this size are just permutations of those three rules.
+
+With four primitives, the first complete bases appear at full size 14. They are
+again not smaller than SK; they are SK plus two identity-like primitives:
+
+```text
+A a -> a
+B a -> a
+C a b -> a
+D a b c -> a c (b c)
+
+S witness: D
+K witness: C
+```
+
+The other eleven results at this size are permutations of those four rules.
 
 The structural filter is on by default. It requires a candidate basis to have at
 least one rule that can discard an argument and at least one rule that can
