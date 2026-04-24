@@ -26,6 +26,11 @@ function tryReduceHead(term, ruleBody) {
     return leftApply([clone(x), ...rest]);
   }
 
+  if (head.name === "I" && spine.length >= 2) {
+    const [, x, ...rest] = spine;
+    return leftApply([clone(x), ...rest]);
+  }
+
   if (head.name === "U" && spine.length >= 2) {
     const [, x, ...rest] = spine;
     return leftApply([replaceX(ruleBody, x), ...rest]);

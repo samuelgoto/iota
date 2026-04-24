@@ -1,4 +1,264 @@
-# Iota-Style One-Point Basis Search
+# One-Point Basis Search
+
+This repo currently has two related searches:
+
+```text
+Iota-style
+```
+
+Search for unary rules like `U x -> body`, where the body may mention `S` and
+`K`.
+
+```text
+J-style
+```
+
+Search for one-symbol head-pattern systems where certain `J`-only heads behave
+like `S` and `K`, without using `S` or `K` as primitive symbols.
+
+## J-Style Search
+
+The J-style search is deliberately separate from the Iota-style search. It does
+not use `S` or `K` inside the primitive definition. Instead, it searches for
+`J`-only expression heads that can be assigned the behavior of `S` and `K`:
+
+```text
+SHead a b c -> a c (b c)
+KHead a b   -> a
+```
+
+where `SHead` and `KHead` are non-overlapping expression heads built only from
+`J`. This is not yet a search over every possible one-symbol rewrite system; it
+is a search over direct SK embeddings, where two `J`-only head patterns behave
+like the SK basis.
+
+The size metric is total head size:
+
+```text
+size(SHead) + size(KHead)
+```
+
+where size counts `J` leaves. For example:
+
+```text
+J             size 1
+J J           size 2
+J (J J)       size 3
+(J J) J       size 3
+```
+
+The classic system is:
+
+```text
+SHead = J J
+KHead = J (J J)
+```
+
+which gives:
+
+```text
+J J a b c       -> a c (b c)
+J (J J) a b     -> a
+```
+
+Run it with:
+
+```sh
+npm run j-search -- --max-head-size 3
+npm run j-search -- --max-head-size 4 --limit 20
+npm run j-search -- --max-head-size 5 --limit 5
+```
+
+Current results:
+
+```text
+max head size 3 -> 4 systems
+max head size 4 -> 46 systems
+max head size 5 -> 424 systems
+```
+
+With non-overlapping heads, the shortest systems found have total head size 5.
+The first two are:
+
+```text
+SHead = J (J J)   size 3
+KHead = J J       size 2
+total = 5
+```
+
+and:
+
+```text
+SHead = J J       size 2
+KHead = J (J J)   size 3
+total = 5
+```
+
+The second one is the classic `j` presentation.
+
+### What "Overlapping Heads" Means
+
+Two heads overlap when one can match the beginning of the other. For example:
+
+```text
+J
+J J
+```
+
+overlap because any term beginning with `J J ...` also begins with `J ...`.
+
+If you run:
+
+```sh
+npm run j-search -- --max-head-size 2 --allow-overlap
+```
+
+the program finds a smaller order-dependent system:
+
+```text
+SHead = J J
+KHead = J
+total = 3
+```
+
+This system only works if the evaluator gives the `SHead = J J` rule priority
+over the `KHead = J` rule. The ambiguity shows up on this term:
+
+```text
+J J a b c
+```
+
+If the `SHead = J J` rule fires first:
+
+```text
+J J a b c -> a c (b c)
+```
+
+If the `KHead = J` rule fires first:
+
+```text
+J J a b c -> J b c -> b
+```
+
+Those are different results. The default search rejects this kind of system
+because it is not a clean set of independent head patterns; its meaning depends
+on rule priority.
+
+## General J-Like Rewrite-System Search
+
+The direct J-style search above still hard-codes the two rule bodies:
+
+```text
+a c (b c)
+a
+```
+
+The more general search tries to find systems that are "like `j`, but not
+necessarily `j`." It enumerates two-rule systems of this form:
+
+```text
+Head v0 v1 ... -> Body
+Head v0 v1 ... -> Body
+```
+
+where:
+
+```text
+Head
+```
+
+is built only from `J`.
+
+```text
+Body
+```
+
+is built only from the rule arguments `v0`, `v1`, ...
+
+The search then looks for `J`-only witnesses that behave like `S` and `K`.
+This means a system can be found even if neither rule is directly an `S` rule
+or directly a `K` rule.
+
+Run it with:
+
+```sh
+npm run general-j-search -- --max-head-size 3 --max-arity 3 --max-body-leaves 4 --max-witness-size 5 --max-full-size 14
+npm run general-j-search -- --max-head-size 3 --max-arity 3 --max-body-leaves 4 --max-witness-size 5 --max-full-size 15
+npm run general-j-search -- --max-head-size 3 --max-arity 3 --max-body-leaves 4 --max-witness-size 5 --max-full-size 16 --limit 20
+```
+
+The main size metric is:
+
+```text
+full size = head leaves + arity + body leaves
+```
+
+For the classic `j` system:
+
+```text
+J J v0 v1 v2       -> v0 v2 (v1 v2)
+J (J J) v0 v1      -> v0
+```
+
+the full size is:
+
+```text
+(2 + 3 + 4) + (3 + 2 + 1) = 15
+```
+
+Current bounded results:
+
+```text
+full size <= 14 -> 0 systems
+full size <= 15 -> 2 systems
+full size <= 16 -> 6 systems
+```
+
+So, under this two-rule, non-overlapping-head, variable-only-body search,
+nothing smaller than the classic `j` system was found. At exactly size 15, the
+only systems found are the classic system and the S/K-swapped version:
+
+```text
+J J v0 v1 -> v0
+J (J J) v0 v1 v2 -> v0 v2 (v1 v2)
+
+S witness: J (J J)
+K witness: J J
+```
+
+```text
+J (J J) v0 v1 -> v0
+J J v0 v1 v2 -> v0 v2 (v1 v2)
+
+S witness: J J
+K witness: J (J J)
+```
+
+At size 16, genuinely different-looking variants begin to appear. For example:
+
+```text
+J (J J) v0 v1 v2 -> v1
+J J v0 v1 v2 -> v0 v2 (v1 v2)
+
+S witness: J J
+K witness: J (J J) J
+```
+
+and:
+
+```text
+J J v0 v1 v2 -> v1
+J (J J) v0 v1 v2 -> v0 v2 (v1 v2)
+
+S witness: J (J J)
+K witness: J J J
+```
+
+These are still very close to `j`: they keep one S-like rule and replace the
+K-like rule with a projection that needs one extra dummy argument. But they are
+not exactly the classic `j` presentation.
+
+## Iota-Style Search
 
 This searches for one-combinator bases of the form:
 
@@ -76,7 +336,41 @@ best treated as generated SK-packaging variants unless a better source is found.
 npm test
 npm run search -- --length 1
 npm run search -- --length 3 --max-expression-size 8 --max-reduction-steps 100 --max-term-size 1000
+npm run search -- --length 3 --max-expression-size 10 --max-reduction-steps 100 --max-term-size 1000
+npm run search -- --length 3 --tokens x,S,K,I --max-expression-size 9 --max-reduction-steps 100 --max-term-size 1000
+npm run search -- --length 3 --left-associated-only --max-expression-size 10
 ```
+
+Useful search knobs:
+
+```text
+--max-expression-size N
+```
+
+Raises the largest `U`-only witness expression considered for `S` and `K`.
+This is the main relaxation if a real basis needs larger witnesses.
+
+```text
+--max-reduction-steps N
+--max-term-size N
+```
+
+Raises evaluator limits. These are safety bounds; some bad candidates expand
+very quickly.
+
+```text
+--tokens x,S,K,I
+```
+
+Relaxes the rule-body alphabet. The default is `x,S,K`. Adding `I` treats
+identity as a primitive shorthand, so it changes the size metric.
+
+```text
+--left-associated-only
+```
+
+Restricts bodies to the original `x A B ...` shape. This is not a relaxation,
+but it is useful for comparing directly with Iota-style definitions.
 
 ## Known Small Results With Current Bounds
 
@@ -95,6 +389,19 @@ none
 ### Length 3
 
 Found 2 candidates.
+
+This has been checked in a few nearby regimes:
+
+```text
+tokens x,S,K; all binary trees; max witness size 10 -> 2 candidates
+tokens x,S,K,I; all binary trees; max witness size 9 -> 2 candidates
+tokens x,S,K; left-associated only; max witness size 10 -> 2 candidates
+```
+
+So, with the current notion of "length 3", the search still only finds the two
+expected candidates. This is not a proof that no candidate exists with a much
+larger witness, but it does suggest the scarcity is not just caused by the
+initial `--max-expression-size 8` bound.
 
 #### 1. `U x -> ((x S) K)`
 

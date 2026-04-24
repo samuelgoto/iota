@@ -1,9 +1,13 @@
-import { app, equals, format, formatCompact, leftApply, size, sym, U } from "./terms.js";
+import { app, equals, format, formatCompact, key, leftApply, size, sym, U } from "./terms.js";
 import { normalize } from "./reduce.js";
 
 const BODY_TOKENS = ["x", "S", "K"];
 
 function tokenToTerm(token) {
+  if (!BODY_TOKENS.includes(token) && !["I"].includes(token)) {
+    throw new Error(`unsupported body token: ${token}`);
+  }
+
   return sym(token);
 }
 
@@ -133,14 +137,31 @@ export function findWitnesses(ruleBody, options = {}) {
   const maxReductionSteps = options.maxReductionSteps ?? 1000;
   const maxTermSize = options.maxTermSize ?? 5000;
   const witnesses = {};
+  const proofCache = new Map();
   const reductionOptions = {
     maxSteps: maxReductionSteps,
     maxTermSize,
   };
 
+  function cachedProof(kind, expression) {
+    const cacheKey = `${kind}:${key(expression)}`;
+
+    if (proofCache.has(cacheKey)) {
+      return proofCache.get(cacheKey);
+    }
+
+    const proof =
+      kind === "S"
+        ? provesSBehavior(expression, ruleBody, reductionOptions)
+        : provesKBehavior(expression, ruleBody, reductionOptions);
+
+    proofCache.set(cacheKey, proof);
+    return proof;
+  }
+
   for (const expression of enumerateUTerms(maxExpressionSize)) {
     if (!witnesses.S) {
-      const proof = provesSBehavior(expression, ruleBody, reductionOptions);
+      const proof = cachedProof("S", expression);
 
       if (proof.proved) {
         witnesses.S = { expression, steps: proof.steps };
@@ -148,7 +169,7 @@ export function findWitnesses(ruleBody, options = {}) {
     }
 
     if (!witnesses.K) {
-      const proof = provesKBehavior(expression, ruleBody, reductionOptions);
+      const proof = cachedProof("K", expression);
 
       if (proof.proved) {
         witnesses.K = { expression, steps: proof.steps };
@@ -165,8 +186,11 @@ export function findWitnesses(ruleBody, options = {}) {
 
 export function searchBodyLength(length, options = {}) {
   const results = [];
+  const bodyTerms = options.leftAssociatedOnly
+    ? [...enumerateBodies(length, options.tokens ?? BODY_TOKENS)].map(bodyFromTokens)
+    : enumerateBodyTerms(length, options.tokens ?? BODY_TOKENS);
 
-  for (const ruleBody of enumerateBodyTerms(length, options.tokens ?? BODY_TOKENS)) {
+  for (const ruleBody of bodyTerms) {
     const witnesses = findWitnesses(ruleBody, options);
 
     if (witnesses.S && witnesses.K) {

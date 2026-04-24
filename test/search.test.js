@@ -44,4 +44,23 @@ describe("one-point basis search", () => {
     assert.ok(witnesses.S);
     assert.ok(witnesses.K);
   });
+
+  it("can enumerate a relaxed body alphabet that includes I", () => {
+    const tokens = ["x", "S", "K", "I"];
+
+    assert.equal(enumerateBodyTerms(3, tokens).length, candidateCount(3, tokens.length));
+  });
+
+  it("can search only left-associated bodies", function () {
+    this.timeout(10000);
+
+    const results = searchBodyLength(3, {
+      leftAssociatedOnly: true,
+      maxExpressionSize: 8,
+      maxReductionSteps: 100,
+      maxTermSize: 1000,
+    });
+
+    assert.equal(results.length, 2);
+  });
 });

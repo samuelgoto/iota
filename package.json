@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "general-j-search": "node ./bin/general-j-search.js",
+    "j-search": "node ./bin/j-search.js",
     "search": "node ./bin/search.js",
     "test": "mocha \"test/**/*.test.js\""
   },

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { bodyFromTokens } from "../src/search.js";
-import { app, equals, K, leftApply, S, sym, U } from "../src/terms.js";
+import { app, equals, I, K, leftApply, S, sym, U } from "../src/terms.js";
 import { normalize, reduceOneNormalOrder } from "../src/reduce.js";
 
 describe("normal-order reduction", () => {
@@ -18,5 +18,13 @@ describe("normal-order reduction", () => {
     const reduced = reduceOneNormalOrder(app(U, U), ruleBody);
 
     assert.equal(equals(reduced, leftApply([U, S, K])), true);
+  });
+
+  it("reduces I to its argument", () => {
+    const x = sym("a");
+    const reduced = normalize(app(I, x), U);
+
+    assert.equal(reduced.halted, true);
+    assert.equal(equals(reduced.term, x), true);
   });
 });

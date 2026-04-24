@@ -8,6 +8,7 @@ export function app(left, right) {
 
 export const S = sym("S");
 export const K = sym("K");
+export const I = sym("I");
 export const U = sym("U");
 
 export function clone(term) {
@@ -67,6 +68,10 @@ export function format(term) {
   return `(${format(term.left)} ${format(term.right)})`;
 }
 
+export function key(term) {
+  return format(term);
+}
+
 export function formatCompact(term) {
   const parts = flattenLeftApplication(term).map((part) => {
     if (part.type === "sym") {
@@ -78,4 +83,3 @@ export function formatCompact(term) {
 
   return parts.join(" ");
 }
-
