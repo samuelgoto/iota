@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "basis-search": "node ./bin/basis-search.js",
     "general-j-search": "node ./bin/general-j-search.js",
     "j-search": "node ./bin/j-search.js",
     "search": "node ./bin/search.js",

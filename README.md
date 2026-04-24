@@ -1,6 +1,6 @@
 # One-Point Basis Search
 
-This repo currently has two related searches:
+This repo currently has several related searches:
 
 ```text
 Iota-style
@@ -15,6 +15,14 @@ J-style
 
 Search for one-symbol head-pattern systems where certain `J`-only heads behave
 like `S` and `K`, without using `S` or `K` as primitive symbols.
+
+```text
+Ordinary combinator basis
+```
+
+Search for fixed-arity primitive rules like `A a b -> a` and
+`B a b c -> a c (b c)`, then check whether the primitives can produce
+`S` and `K`.
 
 ## J-Style Search
 
@@ -157,8 +165,8 @@ The more general search tries to find systems that are "like `j`, but not
 necessarily `j`." It enumerates two-rule systems of this form:
 
 ```text
-Head v0 v1 ... -> Body
-Head v0 v1 ... -> Body
+Head a b ... -> Body
+Head a b ... -> Body
 ```
 
 where:
@@ -173,7 +181,7 @@ is built only from `J`.
 Body
 ```
 
-is built only from the rule arguments `v0`, `v1`, ...
+is built only from the rule arguments `a`, `b`, ...
 
 The search then looks for `J`-only witnesses that behave like `S` and `K`.
 This means a system can be found even if neither rule is directly an `S` rule
@@ -196,8 +204,8 @@ full size = head leaves + arity + body leaves
 For the classic `j` system:
 
 ```text
-J J v0 v1 v2       -> v0 v2 (v1 v2)
-J (J J) v0 v1      -> v0
+J J a b c       -> a c (b c)
+J (J J) a b      -> a
 ```
 
 the full size is:
@@ -219,16 +227,16 @@ nothing smaller than the classic `j` system was found. At exactly size 15, the
 only systems found are the classic system and the S/K-swapped version:
 
 ```text
-J J v0 v1 -> v0
-J (J J) v0 v1 v2 -> v0 v2 (v1 v2)
+J J a b -> a
+J (J J) a b c -> a c (b c)
 
 S witness: J (J J)
 K witness: J J
 ```
 
 ```text
-J (J J) v0 v1 -> v0
-J J v0 v1 v2 -> v0 v2 (v1 v2)
+J (J J) a b -> a
+J J a b c -> a c (b c)
 
 S witness: J J
 K witness: J (J J)
@@ -237,8 +245,8 @@ K witness: J (J J)
 At size 16, genuinely different-looking variants begin to appear. For example:
 
 ```text
-J (J J) v0 v1 v2 -> v1
-J J v0 v1 v2 -> v0 v2 (v1 v2)
+J (J J) a b c -> b
+J J a b c -> a c (b c)
 
 S witness: J J
 K witness: J (J J) J
@@ -247,8 +255,8 @@ K witness: J (J J) J
 and:
 
 ```text
-J J v0 v1 v2 -> v1
-J (J J) v0 v1 v2 -> v0 v2 (v1 v2)
+J J a b c -> b
+J (J J) a b c -> a c (b c)
 
 S witness: J (J J)
 K witness: J J J
@@ -257,6 +265,104 @@ K witness: J J J
 These are still very close to `j`: they keep one S-like rule and replace the
 K-like rule with a projection that needs one extra dummy argument. But they are
 not exactly the classic `j` presentation.
+
+## Ordinary Combinator-Basis Search
+
+This search looks through bases made of ordinary fixed-arity combinators. A
+candidate basis with two primitives looks like:
+
+```text
+A a b ... -> BodyA
+B a b ... -> BodyB
+```
+
+where each body is built only from that rule's arguments. This includes the
+traditional SK basis:
+
+```text
+K a b -> a
+S a b c -> a c (b c)
+```
+
+The search does not allow rule bodies to mention `S`, `K`, `A`, `B`, or any
+other primitive. That keeps this space focused on ordinary combinators rather
+than Iota-style "package SK into a new operator" definitions.
+
+Run it with:
+
+```sh
+npm run basis-search -- --primitives 2 --max-arity 3 --max-body-leaves 4 --max-witness-size 3 --max-reduction-steps 20 --max-term-size 200 --max-full-size 9
+npm run basis-search -- --primitives 2 --max-arity 3 --max-body-leaves 4 --max-witness-size 3 --max-reduction-steps 20 --max-term-size 200 --max-full-size 10
+npm run basis-search -- --primitives 2 --max-arity 3 --max-body-leaves 4 --max-witness-size 4 --max-reduction-steps 30 --max-term-size 300 --max-full-size 11
+npm run basis-search -- --primitives 1 --max-arity 4 --max-body-leaves 5 --max-witness-size 6 --max-reduction-steps 30 --max-term-size 300 --max-full-size 12
+```
+
+The main size metric is:
+
+```text
+full size = arity + body leaves
+```
+
+summed over all primitive rules. For SK:
+
+```text
+K: arity 2 + body 1 = 3
+S: arity 3 + body 4 = 7
+total = 10
+```
+
+Current bounded results:
+
+```text
+1 primitive, full size <= 12 -> 0 complete bases
+2 primitives, full size <= 9 -> 0 complete bases
+2 primitives, full size <= 10 -> 2 complete bases
+2 primitives, full size <= 11 -> 6 complete bases
+```
+
+At full size 10, the only complete bases found are exactly SK and the swapped
+ordering:
+
+```text
+A a b c -> a
+B a b c -> a c (b c)
+
+S witness: B
+K witness: B A A
+```
+
+```text
+A a b c -> a c (b c)
+B a b -> a
+
+S witness: A
+K witness: B
+```
+
+At full size 11, the first non-SK variants appear. They are not smaller than
+SK; they are SK-like variants where the K behavior is recovered from a
+three-argument projection. Examples:
+
+```text
+A a b c -> a c (b c)
+B a b c -> b
+
+S witness: A
+K witness: B A
+```
+
+```text
+A a b -> a
+B a b c -> a c (b c)
+
+S witness: B
+K witness: A
+```
+
+The structural filter is on by default. It requires a candidate basis to have at
+least one rule that can discard an argument and at least one rule that can
+duplicate an argument. Without those two capabilities, the basis cannot recover
+both `K` and `S` in this ordinary variable-only rule space.
 
 ## Iota-Style Search
 

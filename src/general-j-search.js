@@ -5,23 +5,18 @@ import {
   flattenLeftApplication,
   format,
   formatCompact,
+  isRuleVarName,
   key,
   leftApply,
+  ruleVarIndex,
+  ruleVarName,
   size,
   sym,
 } from "./terms.js";
 import { J, enumerateJTerms, headsOverlap } from "./j-style.js";
 
-function varName(index) {
-  return `v${index}`;
-}
-
 function isVar(term) {
-  return term.type === "sym" && /^v\d+$/.test(term.name);
-}
-
-function varIndex(term) {
-  return Number.parseInt(term.name.slice(1), 10);
+  return term.type === "sym" && isRuleVarName(term.name);
 }
 
 function substituteVars(term, bindings) {
@@ -30,7 +25,7 @@ function substituteVars(term, bindings) {
       return clone(term);
     }
 
-    const binding = bindings[varIndex(term)];
+    const binding = bindings[ruleVarIndex(term.name)];
 
     if (!binding) {
       throw new Error(`unbound variable in rule body: ${term.name}`);
@@ -51,7 +46,7 @@ export function enumerateVarBodies(arity, maxLeaves) {
     throw new Error("maxLeaves must be a positive integer");
   }
 
-  const vars = Array.from({ length: arity }, (_, index) => sym(varName(index)));
+  const vars = Array.from({ length: arity }, (_, index) => sym(ruleVarName(index)));
   const byLeaves = new Map([[1, vars]]);
   const all = [...vars];
 
@@ -356,7 +351,7 @@ export function sortGeneralJSystems(systems) {
 }
 
 function describeRule(rule, cost) {
-  const vars = Array.from({ length: rule.arity }, (_, index) => varName(index)).join(" ");
+  const vars = Array.from({ length: rule.arity }, (_, index) => ruleVarName(index)).join(" ");
   return [
     `${formatCompact(rule.head)} ${vars} -> ${formatCompact(rule.body)}`,
     `  head=${cost.headSize}, arity=${cost.arity}, body=${cost.bodySize}, full=${cost.fullSize}`,
@@ -382,12 +377,12 @@ export function classicJSystem() {
       {
         head: app(J, J),
         arity: 3,
-        body: app(app(sym("v0"), sym("v2")), app(sym("v1"), sym("v2"))),
+        body: app(app(sym("a"), sym("c")), app(sym("b"), sym("c"))),
       },
       {
         head: app(J, app(J, J)),
         arity: 2,
-        body: sym("v0"),
+        body: sym("a"),
       },
     ],
   };

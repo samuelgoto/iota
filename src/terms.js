@@ -11,6 +11,24 @@ export const K = sym("K");
 export const I = sym("I");
 export const U = sym("U");
 
+const RULE_VAR_NAMES = "abcdefghijklmnopqrstuvwxyz".split("");
+
+export function ruleVarName(index) {
+  return RULE_VAR_NAMES[index] ?? `arg${index}`;
+}
+
+export function isRuleVarName(name) {
+  return RULE_VAR_NAMES.includes(name) || /^arg\d+$/.test(name);
+}
+
+export function ruleVarIndex(name) {
+  if (/^arg\d+$/.test(name)) {
+    return Number.parseInt(name.slice(3), 10);
+  }
+
+  return RULE_VAR_NAMES.indexOf(name);
+}
+
 export function clone(term) {
   if (term.type === "sym") {
     return sym(term.name);
