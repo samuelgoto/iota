@@ -3,15 +3,15 @@
 This repo explores three related questions about tiny complete combinatory
 systems:
 
-1. Can we find something smaller or simpler than the classic Iota combinator?
-2. Can we find something smaller or simpler than `SK`?
-3. Can we find something smaller or simpler than the classical `J` encoding?
+1. Can we find something smaller or simpler than the classic [Iota](https://en.wikipedia.org/wiki/Iota_and_Jot) combinator?
+2. Can we find something smaller or simpler than [`SK`](https://en.wikipedia.org/wiki/SKI_combinator_calculus)?
+3. Can we find something smaller or simpler than the classical [J](https://en.wikipedia.org/wiki/Combinatory_logic) encoding?
 
 The answer, within the bounded searches in this repository, is:
 
 1. For Iota-like one-symbol systems, we found the classic `U x -> x S K` and a
-   comparable alternative `U x -> x K S`, plus a few longer variants. We did
-   not find a better standalone Iota in the searched space.
+   comparable alternative `U x -> x K S` (`rho`-style), plus a few longer
+   variants. We did not find a better standalone Iota in the searched space.
 2. For ordinary combinator bases, `SK` was the smallest complete basis we found.
    Adding more primitives only produced `SK` plus identity-like extras or
    larger variants.
@@ -23,6 +23,35 @@ global optimality.
 
 The detailed sections below explain each search space and show the exact
 commands and results.
+
+## References
+
+The names used in this repo are anchored to these references:
+
+```text
+Iota
+```
+
+[Iota and Jot](https://en.wikipedia.org/wiki/Iota_and_Jot)
+
+```text
+SK
+```
+
+[SKI combinator calculus](https://en.wikipedia.org/wiki/SKI_combinator_calculus)
+
+```text
+J-style classical one-point basis
+```
+
+[Combinatory logic](https://en.wikipedia.org/wiki/Combinatory_logic), especially
+the one-point-basis section
+
+```text
+Rho-style alternative
+```
+
+[One-point bases for lambda-calculus](https://olydis.medium.com/one-point-bases-for-%CE%BB-calculus-4163b1b326ad)
 
 ## J-Style Search
 
